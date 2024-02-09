@@ -9,5 +9,17 @@ package com.apimeteorologica.datosmeteorologicos.payload.response;
  * @author Jan Carlo
  */
 public class MessageResponse {
-    
+	private String message;
+
+	public MessageResponse(String message) {
+	    this.message = message;
+	  }
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
 }
