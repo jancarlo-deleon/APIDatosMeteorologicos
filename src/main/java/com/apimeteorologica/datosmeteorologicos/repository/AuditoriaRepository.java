@@ -6,11 +6,13 @@ package com.apimeteorologica.datosmeteorologicos.repository;
 
 import com.apimeteorologica.datosmeteorologicos.entity.Auditoria;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author Jan Carlo
  */
+@Repository
 public interface AuditoriaRepository extends JpaRepository<Auditoria,Long>{
     
 }

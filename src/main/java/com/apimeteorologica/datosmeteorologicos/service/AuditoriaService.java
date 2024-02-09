@@ -8,11 +8,13 @@ import com.apimeteorologica.datosmeteorologicos.entity.Auditoria;
 import com.apimeteorologica.datosmeteorologicos.repository.AuditoriaRepository;
 import com.apimeteorologica.datosmeteorologicos.security.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Jan Carlo
  */
+@Service
 public class AuditoriaService {
     
     @Autowired
