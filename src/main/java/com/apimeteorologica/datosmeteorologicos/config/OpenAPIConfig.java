@@ -1,4 +1,4 @@
-package com.jdeleonc.quickstart.config;
+package com.apimeteorologica.datosmeteorologicos.config;
 
 import java.util.List;
 

@@ -69,9 +69,10 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint((AuthenticationEntryPoint) unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth
-                        -> auth.requestMatchers("/auth/**").permitAll()
-//                        .requestMatchers("/api/test/**").permitAll()
-//                        .anyRequest().authenticated()
+                        -> auth.requestMatchers(SWAGGER).permitAll()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/datosmeteorologicos/**").permitAll()
+                        .anyRequest().authenticated()
                 );
 
         http.authenticationProvider(authenticationProvider());
@@ -80,5 +81,14 @@ public class WebSecurityConfig {
 
         return http.build();
     }
+    
+     private static final String[] SWAGGER = {
+      "api/v1/auth/**",
+      "/v3/api-docs/**",
+      "/v3/api-docs.yaml",
+      "/swagger-ui/**",
+      "/swagger-ui.html"
+    };
+
 
 }
