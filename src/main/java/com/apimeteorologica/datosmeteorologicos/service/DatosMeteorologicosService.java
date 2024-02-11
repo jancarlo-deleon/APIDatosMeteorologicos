@@ -1,6 +1,7 @@
 package com.apimeteorologica.datosmeteorologicos.service;
 
 import com.apimeteorologica.datosmeteorologicos.dto.ClimaDto;
+import com.apimeteorologica.datosmeteorologicos.dto.PronosticoDto;
 
 /**
  *
@@ -9,5 +10,7 @@ import com.apimeteorologica.datosmeteorologicos.dto.ClimaDto;
 public interface DatosMeteorologicosService {
 
     ClimaDto obtenerClimaPorCiudad(String ciudad);
+    
+    PronosticoDto obtenerPronostico5diasPorCiudad(String ciudad);
 
 }

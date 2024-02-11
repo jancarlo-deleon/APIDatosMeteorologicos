@@ -2,6 +2,7 @@ package com.apimeteorologica.datosmeteorologicos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 
@@ -11,7 +12,7 @@ import lombok.Data;
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ClimaDto {
+public class ClimaDto implements Serializable {
 
     @JsonProperty("name")
     private String ciudad;

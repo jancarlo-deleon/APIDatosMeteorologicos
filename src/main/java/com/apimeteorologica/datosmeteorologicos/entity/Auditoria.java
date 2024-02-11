@@ -1,6 +1,7 @@
 package com.apimeteorologica.datosmeteorologicos.entity;
 
 import com.apimeteorologica.datosmeteorologicos.security.entity.User;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,8 +30,10 @@ public class Auditoria {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
-
+    
+    @Column(columnDefinition = "TEXT")
     private String peticion;
-
+    
+    @Column(columnDefinition = "TEXT")
     private String respuesta;
 }

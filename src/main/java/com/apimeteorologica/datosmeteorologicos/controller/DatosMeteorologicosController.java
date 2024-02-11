@@ -1,6 +1,7 @@
 package com.apimeteorologica.datosmeteorologicos.controller;
 
 import com.apimeteorologica.datosmeteorologicos.dto.ClimaDto;
+import com.apimeteorologica.datosmeteorologicos.dto.PronosticoDto;
 import com.apimeteorologica.datosmeteorologicos.exception.ClimaCiudadException;
 import com.apimeteorologica.datosmeteorologicos.security.entity.User;
 import com.apimeteorologica.datosmeteorologicos.security.service.UserDetailsImpl;
@@ -29,7 +30,8 @@ import org.springframework.web.client.RestClientException;
 public class DatosMeteorologicosController {
 
     @Autowired
-    private final DatosMeteorologicosServiceImpl datosMeteorologicosService;
+    private final DatosMeteorologicosService datosMeteorologicosService;
+
     @Autowired
     private AuditoriaService auditoriaService;
 
@@ -38,7 +40,7 @@ public class DatosMeteorologicosController {
     ObjectMapper mapper;
 
     @Autowired
-    public DatosMeteorologicosController(DatosMeteorologicosServiceImpl datosMeteorologicosService) {
+    public DatosMeteorologicosController(DatosMeteorologicosService datosMeteorologicosService) {
         this.datosMeteorologicosService = datosMeteorologicosService;
     }
 
@@ -71,4 +73,37 @@ public class DatosMeteorologicosController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno en el servidor desde el controlador:");
         }
     }
+
+    @GetMapping("/pronostico/{ciudad}")
+    public ResponseEntity<?> obtenerPronostico(@PathVariable String ciudad) {
+
+        if (ciudad == null || ciudad.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Se necesita colocar un valor para el parámetro de ciudad para poder realizar la consulta");
+        }
+
+        try {
+            authentication = SecurityContextHolder.getContext().getAuthentication();
+            userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+            // Realizar la solicitud para obtener el pronostico
+            PronosticoDto pronostico = datosMeteorologicosService.obtenerPronostico5diasPorCiudad(ciudad);
+
+            // Convertir el objeto PronosticoDto a JSON para almacenarlo en la auditoría
+            mapper = new ObjectMapper();
+            String respuesta = mapper.writeValueAsString(pronostico);
+
+            // Registrar la auditoría con la solicitud y la respuesta
+            auditoriaService.registrarAuditoria(userDetails, "GET /datosmeteorologicos/pronostico/" + ciudad, respuesta);
+
+            return ResponseEntity.ok(pronostico);
+        } catch (ClimaCiudadException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al obtener datos del pronostico desde el controlador: " + ex.getMessage());
+        } catch (RestClientException ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al llamar a la API externa de pronostico desde el controlador:");
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno en el servidor de pronostico desde el controlador:");
+        }
+
+    }
+
 }
