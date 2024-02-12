@@ -8,7 +8,11 @@ import com.apimeteorologica.datosmeteorologicos.security.service.UserDetailsImpl
 import com.apimeteorologica.datosmeteorologicos.service.AuditoriaService;
 import com.apimeteorologica.datosmeteorologicos.service.DatosMeteorologicosService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,6 +32,8 @@ import org.springframework.web.client.RestClientException;
 @RequestMapping("/datosmeteorologicos")
 public class DatosMeteorologicosController {
 
+    private Logger logger = LoggerFactory.getLogger(DatosMeteorologicosController.class);
+
     @Autowired
     private final DatosMeteorologicosService datosMeteorologicosService;
 
@@ -44,6 +50,7 @@ public class DatosMeteorologicosController {
     }
 
     @PreAuthorize("hasRole('USER')")
+    @Cacheable("climaCache")
     @GetMapping("/clima/{ciudad}")
     public ResponseEntity<?> obtenerClima(@PathVariable String ciudad) {
         if (ciudad == null || ciudad.isEmpty()) {
@@ -75,6 +82,7 @@ public class DatosMeteorologicosController {
     }
 
     @PreAuthorize("hasRole('USER')")
+    @Cacheable("pronosticoCache")
     @GetMapping("/pronostico/{ciudad}")
     public ResponseEntity<?> obtenerPronostico(@PathVariable String ciudad) {
 
@@ -108,6 +116,7 @@ public class DatosMeteorologicosController {
     }
 
     @PreAuthorize("hasRole('USER')")
+    @Cacheable("contaminacionCache")
     @GetMapping("/contaminacion/{ciudad}")
     public ResponseEntity<?> obtenerContaminacion(@PathVariable String ciudad) {
 
@@ -140,6 +149,5 @@ public class DatosMeteorologicosController {
         }
 
     }
-
 
 }
