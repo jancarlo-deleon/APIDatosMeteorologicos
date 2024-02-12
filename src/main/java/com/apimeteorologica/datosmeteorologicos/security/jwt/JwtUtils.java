@@ -17,6 +17,7 @@ import org.springframework.web.util.WebUtils;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.core.Authentication;
 
 /**
  *
@@ -33,37 +34,26 @@ public class JwtUtils {
     @Value("${datosmeteorologicos.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    @Value("${datosmeteorologicos.app.jwtCookieName}")
-    private String jwtCookie;
+    public String generateJwtToken(Authentication authentication) {
 
-    public String getJwtFromCookies(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtCookie);
-        if (cookie != null) {
-            return cookie.getValue();
-        } else {
-            return null;
-        }
-    }
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
-    public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
-        String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, jwt).path("/").maxAge(24 * 60 * 60).httpOnly(true).build();
-        return cookie;
-    }
-
-    public ResponseCookie getCleanJwtCookie() {
-        ResponseCookie cookie = ResponseCookie.from(jwtCookie, null).path("/").build();
-        return cookie;
-    }
-
-    public String getUserNameFromJwtToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key()).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        return Jwts.builder()
+                .setSubject((userPrincipal.getUsername()))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
+    
+    public String getUserNameFromJwtToken(String token) {
+    return Jwts.parserBuilder().setSigningKey(key()).build()
+               .parseClaimsJws(token).getBody().getSubject();
+  }
 
     public boolean validateJwtToken(String authToken) {
         try {

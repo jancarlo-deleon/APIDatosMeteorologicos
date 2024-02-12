@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,7 @@ public class DatosMeteorologicosController {
         this.datosMeteorologicosService = datosMeteorologicosService;
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/clima/{ciudad}")
     public ResponseEntity<?> obtenerClima(@PathVariable String ciudad) {
         if (ciudad == null || ciudad.isEmpty()) {
@@ -72,6 +74,7 @@ public class DatosMeteorologicosController {
         }
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/pronostico/{ciudad}")
     public ResponseEntity<?> obtenerPronostico(@PathVariable String ciudad) {
 
@@ -104,6 +107,7 @@ public class DatosMeteorologicosController {
 
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/contaminacion/{ciudad}")
     public ResponseEntity<?> obtenerContaminacion(@PathVariable String ciudad) {
 

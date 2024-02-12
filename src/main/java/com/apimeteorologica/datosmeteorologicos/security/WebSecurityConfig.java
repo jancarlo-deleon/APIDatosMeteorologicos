@@ -66,7 +66,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
-                .exceptionHandling(exception -> exception.authenticationEntryPoint((AuthenticationEntryPoint) unauthorizedHandler))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth
                         -> auth.requestMatchers(SWAGGER).permitAll()
@@ -81,14 +81,13 @@ public class WebSecurityConfig {
 
         return http.build();
     }
-    
-     private static final String[] SWAGGER = {
-      "api/v1/auth/**",
-      "/v3/api-docs/**",
-      "/v3/api-docs.yaml",
-      "/swagger-ui/**",
-      "/swagger-ui.html"
-    };
 
+    private static final String[] SWAGGER = {
+        "api/v1/auth/**",
+        "/v3/api-docs/**",
+        "/v3/api-docs.yaml",
+        "/swagger-ui/**",
+        "/swagger-ui.html"
+    };
 
 }

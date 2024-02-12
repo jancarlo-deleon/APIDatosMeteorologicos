@@ -3,7 +3,7 @@ package com.apimeteorologica.datosmeteorologicos.security.controller;
 import com.apimeteorologica.datosmeteorologicos.payload.request.LoginRequest;
 import com.apimeteorologica.datosmeteorologicos.payload.request.SignupRequest;
 import com.apimeteorologica.datosmeteorologicos.payload.response.MessageResponse;
-import com.apimeteorologica.datosmeteorologicos.payload.response.UserInfoResponse;
+import com.apimeteorologica.datosmeteorologicos.payload.response.JwtResponse;
 import com.apimeteorologica.datosmeteorologicos.security.entity.Role;
 import com.apimeteorologica.datosmeteorologicos.security.entity.User;
 import com.apimeteorologica.datosmeteorologicos.security.jwt.JwtUtils;
@@ -37,8 +37,6 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author Jan Carlo
  */
-
-
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/auth")
@@ -62,37 +60,39 @@ public class AuthController {
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(item -> item.getAuthority())
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(new UserInfoResponse(userDetails.getId(),
-                        userDetails.getUsername(),
-                        userDetails.getEmail(),
-                        roles));
+        return ResponseEntity.ok(new JwtResponse(jwt,
+                userDetails.getId(),
+                userDetails.getUsername(),
+                userDetails.getEmail(),
+                roles));
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: ¡El username ingresado ya se encuentra registrado!"));
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: El username ya se encuentra en uso"));
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: ¡El email ingresado ya se encuentra en uso!"));
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: El email ya se encuentra en uso"));
         }
 
-        // Crear nueva cuenta de usuario
+        // Create new user's account
         User user = new User(signUpRequest.getUsername(),
                 signUpRequest.getEmail(),
                 encoder.encode(signUpRequest.getPassword()));
@@ -102,14 +102,20 @@ public class AuthController {
 
         if (strRoles == null) {
             Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER)
-                    .orElseThrow(() -> new RuntimeException("Error: Role no encontrado."));
+                    .orElseThrow(() -> new RuntimeException("Error: Role no encontrado"));
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
                 switch (role) {
+//                    case "admin":
+//                        Role adminRole = roleRepository.findByName(RoleEnum.ROLE_ADMIN)
+//                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+//                        roles.add(adminRole);
+//
+//                        break;
                     default:
                         Role userRole = roleRepository.findByName(RoleEnum.ROLE_USER)
-                                .orElseThrow(() -> new RuntimeException("Error: Role no encontrado."));
+                                .orElseThrow(() -> new RuntimeException("Error: Role no encontrado"));
                         roles.add(userRole);
                 }
             });
@@ -118,13 +124,6 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
-        return ResponseEntity.ok(new MessageResponse("Usuario registrado de manera exitosa"));
-    }
-
-    @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser() {
-        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(new MessageResponse("Haz cerrado sesión"));
+        return ResponseEntity.ok(new MessageResponse("Usuario registrado con exito."));
     }
 }
