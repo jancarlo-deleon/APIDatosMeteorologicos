@@ -36,15 +36,12 @@ public class RateLimitingFilter implements HandlerInterceptor {
 
         // Si el bucket tiene tokens disponibles, acepta la petición
         if (probe.isConsumed()) {
-            // Añade las cabeceras con la información del bucket
             response.addHeader("X-Rate-Limit-Peticiones-Restantes", String.valueOf(probe.getRemainingTokens()));
             response.addHeader("X-Rate-Limit-Reintentar-Despues-De-Pasados-Segundos", String.valueOf(probe.getNanosToWaitForRefill() / 1_000_000_000));
             return true;
         } // Si el bucket está vacío, rechaza la petición
         else {
-            // Añade las cabeceras con la información del bucket
             response.addHeader("X-Rate-Limit-Reintentar-Despues-De-Pasados-Segundos", String.valueOf(probe.getNanosToWaitForRefill() / 1_000_000_000));
-            // Devuelve un código de estado 429
             response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
             return false;
         }

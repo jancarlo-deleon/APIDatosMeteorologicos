@@ -36,8 +36,8 @@ public class RateLimitingConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // Crea un filtro de limitación de tasa que usa el bucket y la dirección IP como clave
-        RateLimitingFilter rateLimitingFilter = new RateLimitingFilter(createBucket(), request -> request.getRemoteAddr());
+        
+        RateLimitingFilter rateLimitingFilter = new RateLimitingFilter(createBucket(), request -> request.getHeader("Authorization"));
 
         // Registra el filtro para todas las peticiones de la API
         registry.addInterceptor(rateLimitingFilter).addPathPatterns("/datosmeteorologicos/**");

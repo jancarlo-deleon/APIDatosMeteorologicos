@@ -1,0 +1,22 @@
+version: '3.9'
+networks:
+  weather-network:
+    driver: bridge
+services:
+  spring-app:
+    image: datosmeteorologicosspring
+    ports:
+      - "8188:8080"
+    networks:
+      - weather-network
+    depends_on:
+      - mysql-db
+  mysql-db:
+    image: mysql:latest
+    ports:
+      - "3309:3306"  
+    environment:
+      MYSQL_ROOT_PASSWORD: 123123
+      MYSQL_DATABASE: datosmeteorologicosdb
+    networks:
+      - weather-network

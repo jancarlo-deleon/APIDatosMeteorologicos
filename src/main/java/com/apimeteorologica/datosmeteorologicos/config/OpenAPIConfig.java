@@ -12,6 +12,7 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
+
 /**
  *
  * @author Jan Carlo
@@ -19,37 +20,38 @@ import io.swagger.v3.oas.models.servers.Server;
 @Configuration
 public class OpenAPIConfig {
 
-  @Value("${bezkoder.openapi.dev-url}")
-  private String devUrl;
+    @Value("${datosmeteorologicos.openapi.dev-url}")
+    private String devUrl;
+    @Value("${datosmeteorologicos.openapi.docker-url}")
+    private String dockerUrl;
 
+    @Bean
+    public OpenAPI myOpenAPI() {
+        Server devServer = new Server();
+        devServer.setUrl(devUrl);
+        devServer.setDescription("Servidor local");
 
-  @Bean
-  public OpenAPI myOpenAPI() {
-    Server devServer = new Server();
-    devServer.setUrl(devUrl);
-    devServer.setDescription("Servidor local");
+        Server prodServer = new Server();
+        prodServer.setUrl(dockerUrl);
+        prodServer.setDescription("Servidor para pruebas con Docker");
 
-    Contact contact = new Contact();
-    contact.setEmail("janleoncif11@gmail.com");
-    contact.setName("Jan Carlo de León");
-    
+        Contact contact = new Contact();
+        contact.setEmail("janleoncif11@gmail.com");
+        contact.setName("Jan Carlo de León");
 
-    
+        Info info = new Info()
+                .title("API Datos Meteorológicos")
+                .version("1.0")
+                .contact(contact)
+                .description("API realizada en Java con el framework Spring Boot, la cual obtiene y presenta datos meteorológicos desde OpenWeatherMap.");
 
-    Info info = new Info()
-        .title("API Datos Meteorológicos")
-        .version("1.0")
-        .contact(contact)
-        .description("API realizada en Java con el framework Spring Boot, la cual obtiene y presenta datos meteorológicos desde OpenWeatherMap.");
-
-    return new OpenAPI().info(info).servers(List.of(devServer)).components(new Components()
-                        .addSecuritySchemes("bearerAuth",
-                                new SecurityScheme()
-                                        .type(SecurityScheme.Type.HTTP)
-                                        .scheme("bearer")
-                                        .bearerFormat("JWT")
-                                        .in(SecurityScheme.In.HEADER)
-                                        .name("Authorization")));
-  }
+        return new OpenAPI().info(info).servers(List.of(devServer, prodServer)).components(new Components()
+                .addSecuritySchemes("bearerAuth",
+                        new SecurityScheme()
+                                .type(SecurityScheme.Type.HTTP)
+                                .scheme("bearer")
+                                .bearerFormat("JWT")
+                                .in(SecurityScheme.In.HEADER)
+                                .name("Authorization")));
+    }
 }
-
