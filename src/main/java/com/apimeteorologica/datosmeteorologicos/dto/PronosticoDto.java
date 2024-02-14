@@ -1,28 +1,30 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.apimeteorologica.datosmeteorologicos.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author Jan Carlo
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PronosticoDto implements Serializable {
 
-    private List<WeatherData> list;
+    private List<DatosMeteorologicos> list;
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class WeatherData {
+    public static class DatosMeteorologicos {
 
         private long dt;
         @JsonProperty("main")
@@ -41,6 +43,8 @@ public class PronosticoDto implements Serializable {
         private String dtTxt;
 
         @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Principal {
 
@@ -58,13 +62,15 @@ public class PronosticoDto implements Serializable {
             private int nivelDeTierra;
             @JsonProperty("humidity")
             private int humedad;
-            
+
         }
 
         @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Clima {
-            
+
             @JsonProperty("main")
             private String main;
             @JsonProperty("description")
@@ -72,16 +78,21 @@ public class PronosticoDto implements Serializable {
         }
 
         @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Nubes {
+
             @JsonProperty("all")
             private int all;
         }
 
         @Data
+        @AllArgsConstructor
+        @NoArgsConstructor
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Viento {
-            
+
             @JsonProperty("speed")
             private double velocidad;
             @JsonProperty("deg")

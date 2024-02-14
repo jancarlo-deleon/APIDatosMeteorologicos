@@ -77,7 +77,8 @@ public class DatosMeteorologicosController {
         } catch (RestClientException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al llamar a la API externa desde el controlador:");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno en el servidor desde el controlador:");
+            logger.error("Error interno en el servidor desde el controlador:", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno en el servidor desde el controlador: " + ex.getMessage());
         }
     }
 
@@ -110,7 +111,8 @@ public class DatosMeteorologicosController {
         } catch (RestClientException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al llamar a la API externa de pronostico desde el controlador:");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno en el servidor de pronostico desde el controlador:");
+            logger.error("Error interno en el servidor desde el controlador:", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno en el servidor desde el controlador: " + ex.getMessage());
         }
 
     }
@@ -126,14 +128,14 @@ public class DatosMeteorologicosController {
 
         try {
             // Obtener detalles del usuario autenticado
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            authentication = SecurityContextHolder.getContext().getAuthentication();
+            userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
             // Obtener datos de contaminación del aire para la ciudad especificada
             ContaminacionAireDto contaminacionAire = datosMeteorologicosService.obtenerContaminacionAirePorCiudad(ciudad);
 
             // Convertir el objeto ContaminacionAireDto a JSON para almacenarlo en la auditoría
-            ObjectMapper mapper = new ObjectMapper();
+            mapper = new ObjectMapper();
             String respuesta = mapper.writeValueAsString(contaminacionAire);
 
             // Registrar la auditoría con la solicitud y la respuesta
@@ -145,9 +147,9 @@ public class DatosMeteorologicosController {
         } catch (RestClientException ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al llamar a la API externa para contaminación desde el controlador:");
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno en el servidor para contaminación desde el controlador:");
+            logger.error("Error interno en el servidor desde el controlador:", ex);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno en el servidor desde el controlador: " + ex.getMessage());
         }
-
     }
 
 }

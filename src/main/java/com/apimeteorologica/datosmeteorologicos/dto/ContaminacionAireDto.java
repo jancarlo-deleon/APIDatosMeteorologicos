@@ -4,21 +4,26 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  *
  * @author Jan Carlo
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ContaminacionAireDto implements Serializable {
 
     @JsonProperty("coord")
     private Coordenadas coordenadas;
-    
-    
+
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Coordenadas {
 
         @JsonProperty("lon")
@@ -27,12 +32,13 @@ public class ContaminacionAireDto implements Serializable {
         @JsonProperty("lat")
         private double latitud;
     }
-    
-    
+
     @JsonProperty("list")
     private List<AirpollutionData> list;
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class AirpollutionData {
 
@@ -44,6 +50,8 @@ public class ContaminacionAireDto implements Serializable {
     }
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Principal {
 
@@ -52,6 +60,8 @@ public class ContaminacionAireDto implements Serializable {
     }
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Componente {
 
