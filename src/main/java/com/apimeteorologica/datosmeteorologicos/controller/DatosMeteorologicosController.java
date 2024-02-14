@@ -8,6 +8,16 @@ import com.apimeteorologica.datosmeteorologicos.security.service.UserDetailsImpl
 import com.apimeteorologica.datosmeteorologicos.service.AuditoriaService;
 import com.apimeteorologica.datosmeteorologicos.service.DatosMeteorologicosService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +38,8 @@ import org.springframework.web.client.RestClientException;
  *
  * @author Jan Carlo
  */
+@Tag(name = "Datos Meteorológicos", description = "Endpoints para consultar el clima actual, un pronostico de 5 dias y la contaminación de una ciudad. NOTA: Se requiere autenticación para poder obtener pruebas exitosas")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/datosmeteorologicos")
 public class DatosMeteorologicosController {
@@ -49,6 +61,20 @@ public class DatosMeteorologicosController {
         this.datosMeteorologicosService = datosMeteorologicosService;
     }
 
+    @Operation(summary = "Se utiliza para poder consultar el clima de una ciudad, pasando como parámetro el nombre de la misma.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Peticion exitosa.",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ClimaDto.class))}),
+        @ApiResponse(responseCode = "404", description = "Datos no encontrados",
+                content = @Content),
+        @ApiResponse(responseCode = "403", description = "El usuario no se encuentra autenticado.",
+                content = @Content),
+        @ApiResponse(responseCode = "429", description = "Se ha sobrepasado la cuota de peticiones disponibles.",
+                content = @Content),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content)})
     @PreAuthorize("hasRole('USER')")
     @Cacheable("climaCache")
     @GetMapping("/clima/{ciudad}")
@@ -82,6 +108,20 @@ public class DatosMeteorologicosController {
         }
     }
 
+    @Operation(summary = "Se utiliza para poder consultar el pronóstico del tiempo de los proximos 5 dias de una ciudad, pasando como parámetro el nombre de la misma.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Peticion exitosa.",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PronosticoDto.class))}),
+        @ApiResponse(responseCode = "404", description = "Datos no encontrados",
+                content = @Content),
+        @ApiResponse(responseCode = "403", description = "El usuario no se encuentra autenticado.",
+                content = @Content),
+        @ApiResponse(responseCode = "429", description = "Se ha sobrepasado la cuota de peticiones disponibles.",
+                content = @Content),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content)})
     @PreAuthorize("hasRole('USER')")
     @Cacheable("pronosticoCache")
     @GetMapping("/pronostico/{ciudad}")
@@ -117,6 +157,20 @@ public class DatosMeteorologicosController {
 
     }
 
+    @Operation(summary = "Se utiliza para poder consultar la contaminación que existe en ciudad, pasando como parámetro el nombre de la misma.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Peticion exitosa.",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ContaminacionAireDto.class))}),
+        @ApiResponse(responseCode = "404", description = "Datos no encontrados",
+                content = @Content),
+        @ApiResponse(responseCode = "403", description = "El usuario no se encuentra autenticado.",
+                content = @Content),
+        @ApiResponse(responseCode = "429", description = "Se ha sobrepasado la cuota de peticiones disponibles.",
+                content = @Content),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content)})
     @PreAuthorize("hasRole('USER')")
     @Cacheable("contaminacionCache")
     @GetMapping("/contaminacion/{ciudad}")

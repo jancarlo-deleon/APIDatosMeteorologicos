@@ -1,5 +1,6 @@
 package com.apimeteorologica.datosmeteorologicos.config;
 
+import io.swagger.v3.oas.models.Components;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 /**
  *
@@ -40,7 +42,14 @@ public class OpenAPIConfig {
         .contact(contact)
         .description("API realizada en Java con el framework Spring Boot, la cual obtiene y presenta datos meteorológicos desde OpenWeatherMap.");
 
-    return new OpenAPI().info(info).servers(List.of(devServer));
+    return new OpenAPI().info(info).servers(List.of(devServer)).components(new Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")
+                                        .in(SecurityScheme.In.HEADER)
+                                        .name("Authorization")));
   }
 }
 

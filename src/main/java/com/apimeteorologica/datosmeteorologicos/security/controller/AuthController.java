@@ -11,6 +11,12 @@ import com.apimeteorologica.datosmeteorologicos.security.repository.RoleReposito
 import com.apimeteorologica.datosmeteorologicos.security.repository.UserRepository;
 import com.apimeteorologica.datosmeteorologicos.security.service.UserDetailsImpl;
 import com.apimeteorologica.datosmeteorologicos.security.util.RoleEnum;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,6 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Jan Carlo
  */
 @CrossOrigin(origins = "*", maxAge = 3600)
+@Tag(name = "Registro y autenticación", description = "Endpoints para registro y autenticacion de usuarios.")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -57,6 +64,20 @@ public class AuthController {
     @Autowired
     JwtUtils jwtUtils;
 
+    @Operation(summary = "Se utiliza para poder realizar una autenticación de usuario y obtener el token a utilizar para hacer consultas.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Inicio de Sesión exitoso",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = JwtResponse.class))}),
+        @ApiResponse(responseCode = "400", description = "Peticion invalida",
+                content =  { @Content(schema = @Schema())}),
+        @ApiResponse(responseCode = "401", description = "Credenciales incorrectas",
+                content = @Content),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado",
+                content = @Content),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor",
+                content = @Content)})
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -78,6 +99,16 @@ public class AuthController {
                 roles));
     }
 
+    @Operation(summary = "Se utiliza para poder realizar el registro de nuevos usuarios.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuario creado exitosamente.",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = User.class))}),
+        @ApiResponse(responseCode = "400", description = "Peticion invalida.",
+                content = @Content),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error.",
+                content = @Content)})
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
